@@ -1,0 +1,12 @@
+[package]
+name = "complete"
+version = "0.1.0"
+edition = "2018"
+build = "src/build.rs"
+
+[build-dependencies]
+clap = "2.33"
+structopt = "0.2.15"
+
+[dependencies]
+structopt = "0.2.15"

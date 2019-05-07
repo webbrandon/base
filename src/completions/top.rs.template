@@ -1,0 +1,7 @@
+pub struct S6Completions {
+    
+}
+
+impl S6Completions {
+    pub fn bash() {
+        println!("{}",r#"

@@ -1,0 +1,5 @@
+"#);
+}
+
+pub fn elvish() {
+    println!("{}",r#"
