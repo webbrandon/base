@@ -9,13 +9,14 @@ class for common use cases.  First we will use Clap.rs so we can easily create
 common cli feature and nicely format subcommands and flags into a programmable 
 structure using StructOpt.
 
-### Autocomplete for shell:
+#### Autocomplete for shell:
 - bash
 - zsh
 - fish
 - elvish
 - powershell
 
+---
 #### Work In Progress
 This demo works but the build.rs file and template segments used to achieve this 
 a very hackie.  I would like to come back and do this more elegantly but since it
