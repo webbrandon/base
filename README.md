@@ -1,7 +1,7 @@
 # Generating A Rust Cli Autocomplete SubCommand At Build
 
 This is a demo of how you can create an autocomplete subcommand based on your 
-cli's subcommand and flag options at build time.
+cli's subcommand and flag options at build time for various shells.
 
 ### What I will use:
 I will be using several crates which are currently considered to be the best in 
