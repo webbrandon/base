@@ -2,71 +2,116 @@ extern crate clap;
 extern crate structopt;
 
 include!("cli/mod.rs");
-
-use std::io::Read;
+include!("completions/mod_template.rs");
 use clap::Shell;
 use std::fs::File;
+use std::fs::OpenOptions;
+use std::io::Read;
 use std::io::Write;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 fn main() {
-    let app_name = "complete";
-    let mut app = Opt::clap();
+    let app_name: Option<&'static str> = option_env!("CARGO_PKG_NAME");
+    
+    create_completion_scripts(app_name.unwrap_or("app"));
+    create_completion_mod(app_name.unwrap_or("app"));
+    clean(app_name.unwrap_or("app"));
+}
 
+fn completion_scripts(name: &'static str) -> Vec<PathBuf> {
+    let mut src_dir = String::from("./src/completions/");
+    let mut bash = src_dir.clone();
+    bash.push_str(name);
+    bash.push_str(".bash");
+    let mut fish = src_dir.clone();
+    fish.push_str(name);
+    fish.push_str(".fish");
+    let mut zsh = src_dir.clone();
+    zsh.push_str("_");
+    zsh.push_str(name);
+    let mut ps = src_dir.clone();
+    ps.push_str("_");
+    ps.push_str(name);
+    ps.push_str(".ps1");
+    let mut elvish = src_dir.clone();
+    elvish.push_str(name);
+    elvish.push_str(".elv");
+    
+    vec![
+        Path::new(&bash.clone()).to_path_buf(),
+        Path::new(&fish.clone()).to_path_buf(),
+        Path::new(&zsh.clone()).to_path_buf(),
+        Path::new(&ps.clone()).to_path_buf(),
+        Path::new(&elvish.clone()).to_path_buf(),
+    ]
+}
+
+fn create_completion_mod(name: &'static str) {
+    let file_path = Path::new("./src/completions/mod.rs");    
+    let completion_scripts = completion_scripts(name);
+    let templates = vec![
+        get_top_template(),
+        get_fish_template(),
+        get_zsh_template(),
+        get_ps1_template(),
+        get_elvish_template(),
+    ];
+    
+    File::create(&file_path).unwrap();
+    for i in 0..5 {
+        merge_files_to_completion(
+            file_path.clone().to_path_buf(),
+            completion_scripts[i].to_path_buf(),
+            templates[i].clone(),
+        );
+    }
+    file_to_completion(file_path.to_path_buf(), get_bottom_template());
+}
+
+fn create_completion_scripts(name: &'static str) {
     let out_dir = Path::new("./src/completions/");
-    let file_path = Path::new(&out_dir).join("mod.rs");
+    let mut app = Opt::clap();
     
-    let mut gen = File::create(&file_path).unwrap();
-    
-    app.gen_completions(app_name, Shell::Bash,       "./src/completions/");     
-    app.gen_completions(app_name, Shell::Fish,       "./src/completions/");     
-    app.gen_completions(app_name, Shell::Zsh,        "./src/completions/");   
-    app.gen_completions(app_name, Shell::PowerShell, "./src/completions/");   
-    app.gen_completions(app_name, Shell::Elvish,     "./src/completions/");      
-    
-    let mut top_rs_template = File::open("./src/completions/top.rs.template").expect("");
-    let mut fish_rs_template = File::open("./src/completions/fish.rs.template").expect("");
-    let mut zsh_rs_template = File::open("./src/completions/zsh.rs.template").expect("");
-    let mut ps1_rs_template = File::open("./src/completions/ps1.rs.template").expect("");
-    let mut elvish_rs_template = File::open("./src/completions/elvish.rs.template").expect("");
-    let mut bottom_rs_template = File::open("./src/completions/bottom.rs.template").expect("");
-    
-    let mut bash_file = File::open("./src/completions/complete.bash").expect("");
-    let mut fish_file = File::open("./src/completions/complete.fish").expect("");
-    let mut zsh_file = File::open("./src/completions/_complete").expect("");
-    let mut powershell_file = File::open("./src/completions/_complete.ps1").expect("");
-    let mut elvish_file = File::open("./src/completions/complete.elv").expect("");
-    
-    let mut start_temp = String::new();
-    let mut bash_script = String::new();
-    let mut fish_temp = String::new();
-    let mut fish_script = String::new();
-    let mut zsh_temp = String::new();
-    let mut zsh_script = String::new();
-    let mut ps1_temp = String::new();
-    let mut powershell_script = String::new();
-    let mut elvish_temp = String::new();
-    let mut elvish_script = String::new();
-    let mut bottom_temp = String::new();
-    
-    top_rs_template.read_to_string(&mut start_temp).expect("");
-    bash_file.read_to_string(&mut bash_script).expect("");
-    fish_rs_template.read_to_string(&mut fish_temp).expect("");
-    fish_file.read_to_string(&mut fish_script).expect("");
-    zsh_rs_template.read_to_string(&mut zsh_temp).expect("");
-    zsh_file.read_to_string(&mut zsh_script).expect("");
-    ps1_rs_template.read_to_string(&mut ps1_temp).expect("");
-    powershell_file.read_to_string(&mut powershell_script).expect("");
-    elvish_rs_template.read_to_string(&mut elvish_temp).expect("");
-    elvish_file.read_to_string(&mut elvish_script).expect("");
-    bottom_rs_template.read_to_string(&mut bottom_temp).expect("");
+    app.gen_completions(name, Shell::Bash, out_dir);
+    app.gen_completions(name, Shell::Fish, out_dir);
+    app.gen_completions(name, Shell::Zsh, out_dir);
+    app.gen_completions(name, Shell::PowerShell, out_dir);
+    app.gen_completions(name, Shell::Elvish, out_dir);
+}
 
-    gen.write_fmt(format_args!("{}{}{}{}{}{}{}{}{}{}{}", 
-        start_temp, bash_script, 
-        fish_temp, fish_script, 
-        zsh_temp, zsh_script, 
-        ps1_temp, powershell_script, 
-        elvish_temp, elvish_script, 
-        bottom_temp
-    )).expect("Error writing updated completions.rs module.");
+fn clean(name: &'static str) {
+    let files = completion_scripts(name);
+    for i in 0..5 {
+        match std::fs::remove_file(files[i].to_path_buf()) {
+            Ok(x) => println!("{:#?}", x),
+            Err(e) => eprint!("Error removing file: {}", e),
+        }
+    }
+}
+
+fn merge_files_to_completion(out: PathBuf, script: PathBuf, template: String) {
+    let mut tmp_script = String::new();
+    let mut file_script = File::open(script).expect("");
+
+    file_script.read_to_string(&mut tmp_script).expect("");
+
+    let mut outfile = OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open(out)
+        .unwrap();
+    outfile
+        .write_fmt(format_args!("{}{}", template, tmp_script))
+        .expect("Error writing updated completions.rs module.");
+}
+
+fn file_to_completion(out: PathBuf, template: String) {
+    let mut outfile = OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open(out)
+        .unwrap();
+    outfile
+        .write_fmt(format_args!("{}", template))
+        .expect("Error writing updated completions.rs module.");
 }

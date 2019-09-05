@@ -1,10 +1,15 @@
-pub struct S6Completions {
+pub mod process;
+
+pub use process::CompletionProcess;
+
+pub struct Completions {
     
 }
 
-impl S6Completions {
+impl Completions {
     pub fn bash() {
-        println!("{}",r#"_complete() {
+        println!("{}",r#"
+_complete() {
     local i cur prev opts cmds
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
@@ -153,11 +158,13 @@ impl S6Completions {
 }
 
 complete -F _complete -o bashdefault -o default complete
-"#);
-}
 
-pub fn fish() {
-    println!("{}",r#"complete -c complete -n "__fish_use_subcommand" -s h -l help -d 'Prints help information'
+"#);
+    }
+
+    pub fn fish() {
+        println!("{}",r#"
+complete -c complete -n "__fish_use_subcommand" -s h -l help -d 'Prints help information'
 complete -c complete -n "__fish_use_subcommand" -f -a "completions" -d 'Completion scripts for various shells.'
 complete -c complete -n "__fish_seen_subcommand_from completions" -s h -l help -d 'Prints help information'
 complete -c complete -n "__fish_seen_subcommand_from completions" -s V -l version -d 'Prints version information'
@@ -176,11 +183,13 @@ complete -c complete -n "__fish_seen_subcommand_from powershell" -s h -l help -d
 complete -c complete -n "__fish_seen_subcommand_from powershell" -s V -l version -d 'Prints version information'
 complete -c complete -n "__fish_seen_subcommand_from elvish" -s h -l help -d 'Prints help information'
 complete -c complete -n "__fish_seen_subcommand_from elvish" -s V -l version -d 'Prints version information'
-"#);
-}
 
-pub fn zsh() {
-    println!("{}",r#"#compdef complete
+"#);
+    }
+
+    pub fn zsh() {
+        println!("{}",r#"
+#compdef complete
 
 autoload -U is-at-least
 
@@ -331,11 +340,13 @@ _complete__completions__zsh_commands() {
     _describe -t commands 'complete completions zsh commands' commands "$@"
 }
 
-_complete "$@""#);
-}
+_complete "$@"
+"#);
+    }
 
-pub fn powershell() {
-    println!("{}",r#"
+    pub fn powershell() {
+        println!("{}",r#"
+
 using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
 
@@ -414,11 +425,13 @@ Register-ArgumentCompleter -Native -CommandName 'complete' -ScriptBlock {
     $completions.Where{ $_.CompletionText -like "$wordToComplete*" } |
         Sort-Object -Property ListItemText
 }
-"#);
-}
 
-pub fn elvish() {
-    println!("{}",r#"
+"#);
+    }
+
+    pub fn elvish() {
+        println!("{}",r#"
+        
 edit:completion:arg-completer[complete] = [@words]{
     fn spaces [n]{
         repeat $n ' ' | joins ''
@@ -483,6 +496,7 @@ edit:completion:arg-completer[complete] = [@words]{
     ]
     $completions[$command]
 }
+
 "#);
-}
+    }
 }
