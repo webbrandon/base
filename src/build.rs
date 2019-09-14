@@ -19,7 +19,7 @@ fn main() {
 }
 
 fn completion_scripts(name: &'static str) -> Vec<PathBuf> {
-    let mut src_dir = String::from("./src/completions/");
+    let src_dir = String::from("./src/completions/");
     let mut bash = src_dir.clone();
     bash.push_str(name);
     bash.push_str(".bash");

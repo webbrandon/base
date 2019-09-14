@@ -49,7 +49,7 @@ _complete() {
 
     case "${cmd}" in
         complete)
-            opts=" -h  --help   completions"
+            opts=" -v -h  --verbose --help   completions"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -164,6 +164,7 @@ complete -F _complete -o bashdefault -o default complete
 
     pub fn fish() {
         println!("{}",r#"
+complete -c complete -n "__fish_use_subcommand" -s v -l verbose -d 'Enable verbose logging.'
 complete -c complete -n "__fish_use_subcommand" -s h -l help -d 'Prints help information'
 complete -c complete -n "__fish_use_subcommand" -f -a "completions" -d 'Completion scripts for various shells.'
 complete -c complete -n "__fish_seen_subcommand_from completions" -s h -l help -d 'Prints help information'
@@ -206,6 +207,8 @@ _complete() {
 
     local context curcontext="$curcontext" state line
     _arguments "${_arguments_options[@]}" \
+'-v[Enable verbose logging.]' \
+'--verbose[Enable verbose logging.]' \
 '-h[Prints help information]' \
 '--help[Prints help information]' \
 ":: :_complete_commands" \
@@ -368,6 +371,8 @@ Register-ArgumentCompleter -Native -CommandName 'complete' -ScriptBlock {
 
     $completions = @(switch ($command) {
         'complete' {
+            [CompletionResult]::new('-v', 'v', [CompletionResultType]::ParameterName, 'Enable verbose logging.')
+            [CompletionResult]::new('--verbose', 'verbose', [CompletionResultType]::ParameterName, 'Enable verbose logging.')
             [CompletionResult]::new('-h', 'h', [CompletionResultType]::ParameterName, 'Prints help information')
             [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Prints help information')
             [CompletionResult]::new('completions', 'completions', [CompletionResultType]::ParameterValue, 'Completion scripts for various shells.')
@@ -448,6 +453,8 @@ edit:completion:arg-completer[complete] = [@words]{
     }
     completions = [
         &'complete'= {
+            cand -v 'Enable verbose logging.'
+            cand --verbose 'Enable verbose logging.'
             cand -h 'Prints help information'
             cand --help 'Prints help information'
             cand completions 'Completion scripts for various shells.'

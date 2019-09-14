@@ -1,5 +1,5 @@
 use structopt::StructOpt;
-#[derive(Debug, StructOpt)]
+#[derive(Debug, StructOpt, Clone)]
 #[structopt(raw(global_settings = "&[structopt::clap::AppSettings::DisableHelpSubcommand]"))]
 pub enum Completions {
     /// Bash completion script.
@@ -23,7 +23,7 @@ pub enum Completions {
     Elvish(Elvish)
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, StructOpt, Clone)]
 #[structopt(raw(global_settings = "&[structopt::clap::AppSettings::DisableHelpSubcommand]"))]
 pub struct Bash {
     /// Bash completion script.
@@ -31,7 +31,7 @@ pub struct Bash {
     pub name: String,
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, StructOpt, Clone)]
 #[structopt(raw(global_settings = "&[structopt::clap::AppSettings::DisableHelpSubcommand]"))]
 pub struct Fish {
     /// Fish completion script.
@@ -39,7 +39,7 @@ pub struct Fish {
     pub name: String,
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, StructOpt, Clone)]
 #[structopt(raw(global_settings = "&[structopt::clap::AppSettings::DisableHelpSubcommand]"))]
 pub struct Zsh {
     /// Zsh completion script.
@@ -47,7 +47,7 @@ pub struct Zsh {
     pub name: String,
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, StructOpt, Clone)]
 #[structopt(raw(global_settings = "&[structopt::clap::AppSettings::DisableHelpSubcommand]"))]
 pub struct PowerShell {
     /// PowerShell completion script.
@@ -55,7 +55,7 @@ pub struct PowerShell {
     pub name: String,
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, StructOpt, Clone)]
 #[structopt(raw(global_settings = "&[structopt::clap::AppSettings::DisableHelpSubcommand]"))]
 pub struct Elvish {
     /// Elvish completion script.
