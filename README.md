@@ -22,7 +22,7 @@ Auto completion script for the below list of supported shells are generated at b
 - Elvish
 - PowerShell
 
-# Verbose Logging
+## Verbose Logging
 
 Verbose logging is provided with the use of the `debug!(log_config, "{}", x)` macro.
 
