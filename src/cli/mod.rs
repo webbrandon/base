@@ -26,3 +26,26 @@ pub enum Commands {
     )]
     Completions(Completions),
 }
+
+impl Opt {
+    pub fn has_completion(&self) -> Option<Completions> {
+        match self.commands.to_owned() {
+            Some(commands) => {
+                match commands {
+                    Commands::Completions(completion) => {
+                        Some(completion)
+                    }
+                }
+            },
+            None => None
+        }
+    }
+
+    pub fn is_verbose(&self) -> bool {
+        if self.verbose {
+            false
+        } else {
+            true
+        }
+    }
+}

@@ -1,4 +1,4 @@
-use slog::*;
+pub use slog::*;
 use std::{fmt, result};
 
 pub struct PrintlnSerializer;
@@ -16,12 +16,12 @@ impl PrintlnDrain {
     pub fn get_logger(enable_debug: bool) -> Logger {
         if enable_debug {
             Logger::root(
-                LevelFilter::new(PrintlnDrain, Level::Debug).fuse(), 
+                LevelFilter::new(PrintlnDrain, Level::Debug).fuse(),
                 o!("app" => option_env!("CARGO_PKG_NAME"), "version" => option_env!("CARGO_PKG_VERSION"))
             )
         } else {
             Logger::root(
-                LevelFilter::new(PrintlnDrain, Level::Info).fuse(), 
+                LevelFilter::new(PrintlnDrain, Level::Info).fuse(),
                 o!("app" => option_env!("CARGO_PKG_NAME"), "version" => option_env!("CARGO_PKG_VERSION"))
             )
         }
@@ -31,7 +31,7 @@ impl PrintlnDrain {
 impl Drain for PrintlnDrain {
     type Ok = ();
     type Err = ();
-    
+
     fn log(
         &self,
         record: &Record,
