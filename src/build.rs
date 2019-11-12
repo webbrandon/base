@@ -1,8 +1,8 @@
 extern crate clap;
 extern crate structopt;
 
-include!("cli/mod.rs");
-include!("completions/mod_template.rs");
+include!("command_control/mod.rs");
+include!("command_control/completion_handler/generator/mod.rs");
 use clap::Shell;
 use std::fs::File;
 use std::fs::OpenOptions;
@@ -12,14 +12,14 @@ use std::path::{Path, PathBuf};
 
 fn main() {
     let app_name: Option<&'static str> = option_env!("CARGO_PKG_NAME");
-    
+
     create_completion_scripts(app_name.unwrap_or("app"));
     create_completion_mod(app_name.unwrap_or("app"));
     clean(app_name.unwrap_or("app"));
 }
 
 fn completion_scripts(name: &'static str) -> Vec<PathBuf> {
-    let src_dir = String::from("./src/completions/");
+    let src_dir = String::from("./src/command_control/completion_handler/");
     let mut bash = src_dir.clone();
     bash.push_str(name);
     bash.push_str(".bash");
@@ -36,7 +36,7 @@ fn completion_scripts(name: &'static str) -> Vec<PathBuf> {
     let mut elvish = src_dir.clone();
     elvish.push_str(name);
     elvish.push_str(".elv");
-    
+
     vec![
         Path::new(&bash.clone()).to_path_buf(),
         Path::new(&fish.clone()).to_path_buf(),
@@ -47,16 +47,16 @@ fn completion_scripts(name: &'static str) -> Vec<PathBuf> {
 }
 
 fn create_completion_mod(name: &'static str) {
-    let file_path = Path::new("./src/completions/mod.rs");    
+    let file_path = Path::new("./src/command_control/completion_handler/mod.rs");
     let completion_scripts = completion_scripts(name);
     let templates = vec![
-        get_top_template(),
-        get_fish_template(),
-        get_zsh_template(),
-        get_ps1_template(),
-        get_elvish_template(),
+        ModTemplate::get_top_template(),
+        ModTemplate::get_fish_template(),
+        ModTemplate::get_zsh_template(),
+        ModTemplate::get_ps1_template(),
+        ModTemplate::get_elvish_template(),
     ];
-    
+
     File::create(&file_path).unwrap();
     for i in 0..5 {
         merge_files_to_completion(
@@ -65,13 +65,13 @@ fn create_completion_mod(name: &'static str) {
             templates[i].clone(),
         );
     }
-    file_to_completion(file_path.to_path_buf(), get_bottom_template());
+    file_to_completion(file_path.to_path_buf(), ModTemplate::get_bottom_template());
 }
 
 fn create_completion_scripts(name: &'static str) {
-    let out_dir = Path::new("./src/completions/");
-    let mut app = Opt::clap();
-    
+    let out_dir = Path::new("./src/command_control/completion_handler/");
+    let mut app = CmdCtl::clap();
+
     app.gen_completions(name, Shell::Bash, out_dir);
     app.gen_completions(name, Shell::Fish, out_dir);
     app.gen_completions(name, Shell::Zsh, out_dir);

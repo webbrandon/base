@@ -10,25 +10,25 @@ impl Serializer for PrintlnSerializer {
     }
 }
 
-pub struct PrintlnDrain;
+pub struct RootLog;
 
-impl PrintlnDrain {
+impl RootLog {
     pub fn get_logger(enable_debug: bool) -> Logger {
         if enable_debug {
             Logger::root(
-                LevelFilter::new(PrintlnDrain, Level::Debug).fuse(),
+                LevelFilter::new(RootLog, Level::Debug).fuse(),
                 o!("app" => option_env!("CARGO_PKG_NAME"), "version" => option_env!("CARGO_PKG_VERSION"))
             )
         } else {
             Logger::root(
-                LevelFilter::new(PrintlnDrain, Level::Info).fuse(),
+                LevelFilter::new(RootLog, Level::Info).fuse(),
                 o!("app" => option_env!("CARGO_PKG_NAME"), "version" => option_env!("CARGO_PKG_VERSION"))
             )
         }
     }
 }
 
-impl Drain for PrintlnDrain {
+impl Drain for RootLog {
     type Ok = ();
     type Err = ();
 
@@ -46,7 +46,7 @@ impl Drain for PrintlnDrain {
             .unwrap();
         values.serialize(record, &mut PrintlnSerializer).unwrap();
 
-        println!("");
+        println!(" ");
         Ok(())
     }
 }
