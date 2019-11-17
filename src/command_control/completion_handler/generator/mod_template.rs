@@ -5,14 +5,7 @@ pub struct ModTemplate {
 impl ModTemplate {
     pub fn get_top_template() -> String {
         String::from(
-            r#"pub mod process;
-
-    pub use process::CompletionProcess;
-    use super::cmd_model;
-
-    pub struct CompletionScript {
-
-    }
+            r#"pub struct CompletionScript { }
 
     impl CompletionScript {
         pub fn bash() {
