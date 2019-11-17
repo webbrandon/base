@@ -1,15 +1,15 @@
-# Rust CLI Baseline
+# ![base](docs/image/base.png)
 
-This is a baseline for creating a clean CLI interface with autocompletion and verbose logging. Please feel free to clone and use it for your own development.
+This is a rust language baseline for creating a clean CLI interface with robust feature capabilities for a variety of use cases. Please feel free to clone and use it for your own development.
 
-**Features provided in baseline:**  
+**Current features provided in base.**  
 - StructOpt menu module
 - Verbose logging
 - Generate autocompletion script
 
-## StuctOpt Menu Module
+## Cli Interface
 
-A StuctOpt baseline menu module is provided in `cli` module. Basic logic for autocompletion menu option and verbose logging are already integrated.
+StuctOpt is used in `CmdCtl` module which provides a baseline to cli interface used to handle request.  Add subcommand modules to `src/command_control/cmd_model` directory and include your subcommand module in the `Commands` enum in `src/command_control/cmd_model/mod.rs`. If you wish to extend base interface the entry point is the `CmdCtl` module.
 
 ## Generating Autocomplete Module On Build
 
