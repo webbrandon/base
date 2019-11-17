@@ -1,6 +1,6 @@
 # ![base](docs/image/base.png)
 
-This is a rust language baseline for creating a clean CLI interface with robust feature capabilities for a variety of use cases. Please feel free to clone and use it for your own development.
+This is a rust language baseline for creating a CLI interface with robust features for a variety of use cases. Please feel free to clone and use it for your own development.
 
 **Current features provided in base.**  
 - StructOpt menu module
