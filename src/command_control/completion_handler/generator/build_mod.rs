@@ -14,7 +14,7 @@ impl CompletionScriptModBuilder {
     }
 
     pub fn create(&self, completion_scripts: Vec<PathBuf>, templates: Vec<String>) {
-        let file_path = Path::new("./src/request_manager/completion_handler/completion_scripts.rs");
+        let file_path = Path::new("./src/command_control/completion_handler/completion_scripts.rs");
 
         File::create(&file_path).unwrap();
         for i in 0..5 {

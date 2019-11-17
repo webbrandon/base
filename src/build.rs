@@ -3,12 +3,9 @@ extern crate structopt;
 
 include!("command_control/mod.rs");
 include!("command_control/completion_handler/generator/mod.rs");
+
 use clap::Shell;
-use std::fs::File;
-use std::fs::OpenOptions;
-use std::io::Read;
-use std::io::Write;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 fn main() {
     let app_name: Option<&'static str> = option_env!("CARGO_PKG_NAME");
@@ -16,56 +13,6 @@ fn main() {
     create_completion_scripts(app_name.unwrap_or("app"));
     create_completion_mod(app_name.unwrap_or("app"));
     clean(app_name.unwrap_or("app"));
-}
-
-fn completion_scripts(name: &'static str) -> Vec<PathBuf> {
-    let src_dir = String::from("./src/command_control/completion_handler/");
-    let mut bash = src_dir.clone();
-    bash.push_str(name);
-    bash.push_str(".bash");
-    let mut fish = src_dir.clone();
-    fish.push_str(name);
-    fish.push_str(".fish");
-    let mut zsh = src_dir.clone();
-    zsh.push_str("_");
-    zsh.push_str(name);
-    let mut ps = src_dir.clone();
-    ps.push_str("_");
-    ps.push_str(name);
-    ps.push_str(".ps1");
-    let mut elvish = src_dir.clone();
-    elvish.push_str(name);
-    elvish.push_str(".elv");
-
-    vec![
-        Path::new(&bash.clone()).to_path_buf(),
-        Path::new(&fish.clone()).to_path_buf(),
-        Path::new(&zsh.clone()).to_path_buf(),
-        Path::new(&ps.clone()).to_path_buf(),
-        Path::new(&elvish.clone()).to_path_buf(),
-    ]
-}
-
-fn create_completion_mod(name: &'static str) {
-    let file_path = Path::new("./src/command_control/completion_handler/mod.rs");
-    let completion_scripts = completion_scripts(name);
-    let templates = vec![
-        ModTemplate::get_top_template(),
-        ModTemplate::get_fish_template(),
-        ModTemplate::get_zsh_template(),
-        ModTemplate::get_ps1_template(),
-        ModTemplate::get_elvish_template(),
-    ];
-
-    File::create(&file_path).unwrap();
-    for i in 0..5 {
-        merge_files_to_completion(
-            file_path.clone().to_path_buf(),
-            completion_scripts[i].to_path_buf(),
-            templates[i].clone(),
-        );
-    }
-    file_to_completion(file_path.to_path_buf(), ModTemplate::get_bottom_template());
 }
 
 fn create_completion_scripts(name: &'static str) {
@@ -79,39 +26,27 @@ fn create_completion_scripts(name: &'static str) {
     app.gen_completions(name, Shell::Elvish, out_dir);
 }
 
+fn create_completion_mod(name: &'static str) {
+    let builder =  CompletionScriptModBuilder::new();
+    let completion_scripts = CompletionScriptPath::new(name).get_paths();
+    let templates = vec![
+        ModTemplate::get_top_template(),
+        ModTemplate::get_fish_template(),
+        ModTemplate::get_zsh_template(),
+        ModTemplate::get_ps1_template(),
+        ModTemplate::get_elvish_template(),
+        ModTemplate::get_bottom_template(),
+    ];
+
+    builder.create(completion_scripts, templates);
+}
+
 fn clean(name: &'static str) {
-    let files = completion_scripts(name);
+    let files = CompletionScriptPath::new(name).get_paths();
     for i in 0..5 {
         match std::fs::remove_file(files[i].to_path_buf()) {
             Ok(x) => println!("{:#?}", x),
             Err(e) => eprint!("Error removing file: {}", e),
         }
     }
-}
-
-fn merge_files_to_completion(out: PathBuf, script: PathBuf, template: String) {
-    let mut tmp_script = String::new();
-    let mut file_script = File::open(script).expect("");
-
-    file_script.read_to_string(&mut tmp_script).expect("");
-
-    let mut outfile = OpenOptions::new()
-        .write(true)
-        .append(true)
-        .open(out)
-        .unwrap();
-    outfile
-        .write_fmt(format_args!("{}{}", template, tmp_script))
-        .expect("Error writing updated completions.rs module.");
-}
-
-fn file_to_completion(out: PathBuf, template: String) {
-    let mut outfile = OpenOptions::new()
-        .write(true)
-        .append(true)
-        .open(out)
-        .unwrap();
-    outfile
-        .write_fmt(format_args!("{}", template))
-        .expect("Error writing updated completions.rs module.");
 }

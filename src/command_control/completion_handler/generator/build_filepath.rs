@@ -21,7 +21,7 @@ impl CompletionScriptPath {
     }
 
     fn collect_script_paths(&mut self) {
-        let src_dir = String::from("./src/request_manager/completion_handler/");
+        let src_dir = String::from("./src/command_control/completion_handler/");
 
         // Supported shells.
         self.paths.push(create_pathbuf(self.bash_string_path(&mut src_dir.clone()).clone()));

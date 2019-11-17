@@ -38,7 +38,6 @@ impl Commands {
             Commands::Completions(_) => {
                 false
             },
-            _ => false
         }
     }
 }
